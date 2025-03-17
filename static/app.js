@@ -119,8 +119,8 @@ async function splitPDF() {
     }
 
     try {
+        // ?? Mostrar la barra de carga al iniciar el proceso
         loadingBar.classList.remove("hidden");
-        loadingBar.style.width = "50%";  // Simula la mitad de carga
 
         let response = await fetch(`${BASE_URL}/split/${filename}.pdf`, {
             method: "GET",
@@ -128,10 +128,8 @@ async function splitPDF() {
         });
 
         if (response.ok) {
-            loadingBar.style.width = "100%"; // Simula que termino la carga
             setTimeout(() => {
-                loadingBar.classList.add("hidden");
-                loadingBar.style.width = "0%";
+                loadingBar.classList.add("hidden"); // ?? Ocultar la barra de carga despues de completar
             }, 1000);
 
             showToast("PDF dividido con exito.", "yellow");
@@ -145,7 +143,6 @@ async function splitPDF() {
         showToast("Error al conectar con el servidor.", "red");
     }
 }
-
 
 // ?? Funci¨®n para descargar el ZIP del PDF con autenticaci¨®n
 async function downloadZip() {
