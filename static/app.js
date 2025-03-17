@@ -22,7 +22,7 @@ function checkLoginStatus() {
     if (token) {
         loginSection.classList.add("hidden");
         appSection.classList.remove("hidden");
-        welcomeMessage.innerText = `Hola, ${username}! ??`;  // Muestra el nombre del usuario
+        welcomeMessage.innerText = `Hola, ${username}!`;  // Muestra el nombre del usuario
     } else {
         loginSection.classList.remove("hidden");
         appSection.classList.add("hidden");
