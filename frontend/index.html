@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS - División de PDFs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex justify-center items-center min-h-screen">
+    
+    <!-- Contenedor Principal -->
+    <div class="bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
+        
+        <!-- Login Section -->
+        <div id="loginSection">
+            <h2 class="text-2xl font-bold text-center mb-4">Iniciar Sesión</h2>
+            <input id="username" type="text" placeholder="Usuario" class="w-full p-2 border rounded mb-2">
+            <input id="password" type="password" placeholder="Contraseña" class="w-full p-2 border rounded mb-4">
+            <button onclick="login()" class="w-full bg-blue-500 text-white py-2 rounded">Ingresar</button>
+        </div>
+
+        <!-- App Section (Oculta hasta iniciar sesión) -->
+        <div id="appSection" class="hidden">
+            <h2 class="text-2xl font-bold text-center mb-4">Dividir PDFs</h2>
+
+            <!-- Subir PDF -->
+            <input id="pdfFile" type="file" class="w-full p-2 border rounded mb-4">
+            <button onclick="uploadPDF()" class="w-full bg-green-500 text-white py-2 rounded shadow-md transform transition-all duration-300 hover:scale-105 active:scale-95">
+                Subir PDF
+            </button>
+
+            <hr class="my-4">
+
+            <!-- Procesar PDF -->
+            <input id="filename" type="text" placeholder="Nombre del archivo (sin .pdf)" class="w-full p-2 border rounded mb-4">
+            <button onclick="splitPDF()" class="w-full bg-yellow-500 text-white py-2 rounded shadow-md transform transition-all duration-300 hover:scale-105 active:scale-95">
+                Dividir PDF
+            </button>
+
+            <hr class="my-4">
+
+            <!-- Descargar ZIP -->
+            <button onclick="downloadZip()" class="w-full bg-purple-500 text-white py-2 rounded shadow-md transform transition-all duration-300 hover:scale-105 active:scale-95">
+                Descargar ZIP
+            </button>
+
+            <hr class="my-4">
+
+            <!-- Cerrar sesión -->
+            <button onclick="logout()" class="w-full bg-red-500 text-white py-2 rounded shadow-md transform transition-all duration-300 hover:scale-105 active:scale-95">
+                Cerrar Sesión
+            </button>
+        </div>
+
+        <!-- Mensajes -->
+        <p id="message" class="text-center text-sm text-gray-600 mt-4"></p>
+    </div>
+
+    <!-- Contenedor de Notificaciones Flotantes -->
+	<div id="toast-container" class="fixed top-5 right-5 z-50 space-y-2"></div>
+
+	<!-- Contenedor de Notificaciones Flotantes -->
+	<div id="toast-container" class="fixed top-5 right-5 z-50 space-y-2"></div>
+
+
+    <!-- Archivo de JavaScript -->
+    <script src="app.js"></script>
+
+</body>
+</html>
