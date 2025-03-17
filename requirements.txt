@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+python-multipart
+jose
+passlib
+PyPDF2
