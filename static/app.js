@@ -8,23 +8,28 @@ const BASE_URL = "https://pdf-splitter-v9wm.onrender.com";
 // ?? Verifica si el usuario est芍 autenticado
 function checkLoginStatus() {
     const token = localStorage.getItem("token");
+    const username = localStorage.getItem("username");
 
     const loginSection = document.getElementById("loginSection");
     const appSection = document.getElementById("appSection");
+    const welcomeMessage = document.getElementById("welcomeMessage");
 
-    if (!loginSection || !appSection) {
-        console.error("No se encontraron los elementos loginSection o appSection.");
+    if (!loginSection || !appSection || !welcomeMessage) {
+        console.error("No se encontraron los elementos necesarios.");
         return;
     }
 
     if (token) {
         loginSection.classList.add("hidden");
         appSection.classList.remove("hidden");
+        welcomeMessage.innerText = `Hola, ${username}! ??`;  // Muestra el nombre del usuario
     } else {
         loginSection.classList.remove("hidden");
         appSection.classList.add("hidden");
+        welcomeMessage.innerText = "";  // Oculta el mensaje si no hay sesion
     }
 }
+
 
 // ?? Funci車n para iniciar sesi車n y obtener el token JWT
 async function login() {
@@ -106,27 +111,41 @@ async function uploadPDF() {
 // ?? Funci車n para dividir el PDF con autenticaci車n
 async function splitPDF() {
     let filename = document.getElementById("filename").value.trim();
+    let loadingBar = document.getElementById("loadingBar");
+
     if (!filename) {
         showToast("Ingresa el nombre del archivo (sin .pdf).", "red");
         return;
     }
 
     try {
+        loadingBar.classList.remove("hidden");
+        loadingBar.style.width = "50%";  // Simula la mitad de carga
+
         let response = await fetch(`${BASE_URL}/split/${filename}.pdf`, {
             method: "GET",
             headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
         });
 
         if (response.ok) {
-            showToast("PDF dividido con 谷xito.", "yellow");
+            loadingBar.style.width = "100%"; // Simula que termino la carga
+            setTimeout(() => {
+                loadingBar.classList.add("hidden");
+                loadingBar.style.width = "0%";
+            }, 1000);
+
+            showToast("PDF dividido con exito.", "yellow");
         } else {
+            loadingBar.classList.add("hidden");
             showToast("Error al dividir el PDF.", "red");
         }
     } catch (error) {
         console.error("Error en splitPDF:", error);
+        loadingBar.classList.add("hidden");
         showToast("Error al conectar con el servidor.", "red");
     }
 }
+
 
 // ?? Funci車n para descargar el ZIP del PDF con autenticaci車n
 async function downloadZip() {
