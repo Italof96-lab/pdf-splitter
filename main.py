@@ -145,3 +145,9 @@ def download_pdf_zip(filename: str, user: str = Depends(get_current_user)):
 @app.get("/copyright")
 def copyright_info():
     return {"message": "Copyright Italo Quirozc - Todos los derechos reservados"}
+
+import uvicorn
+
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 8000))  # Obtiene el puerto de Render o usa 8000 por defecto
+    uvicorn.run(app, host="0.0.0.0", port=port)
