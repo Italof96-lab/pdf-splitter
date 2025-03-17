@@ -1,6 +1,7 @@
 from fastapi import FastAPI, File, UploadFile, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jose import JWTError, jwt
+import jwt
+from jwt import PyJWTError
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 import os
@@ -83,7 +84,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         username = payload.get("sub")
         if username is None:
             raise HTTPException(status_code=401, detail="Token invalido")
-    except JWTError:
+    except PyJWTError:
         raise HTTPException(status_code=401, detail="Token invalido")
     return username
 
