@@ -5,3 +5,4 @@ pyjwt
 passlib
 PyPDF2
 python-jose[cryptography]
+passlib[bcrypt]

@@ -12,6 +12,17 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+# ?? Servir archivos estaticos (Frontend)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/")
+async def serve_frontend():
+    return FileResponse("static/index.html")
+
+
 # ?? Habilitar CORS para evitar bloqueos en el navegador
 app.add_middleware(
     CORSMiddleware,
