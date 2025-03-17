@@ -2,19 +2,29 @@ document.addEventListener("DOMContentLoaded", () => {
     checkLoginStatus();
 });
 
+// ?? URL del Backend
+const BASE_URL = "https://pdf-splitter-v9wm.onrender.com";
+
 // ?? Verifica si el usuario est芍 autenticado
 function checkLoginStatus() {
     const token = localStorage.getItem("token");
-    
+
+    const loginSection = document.getElementById("loginSection");
+    const appSection = document.getElementById("appSection");
+
+    if (!loginSection || !appSection) {
+        console.error("No se encontraron los elementos loginSection o appSection.");
+        return;
+    }
+
     if (token) {
-        document.getElementById("loginSection").classList.add("hidden");
-        document.getElementById("appSection").classList.remove("hidden");
+        loginSection.classList.add("hidden");
+        appSection.classList.remove("hidden");
     } else {
-        document.getElementById("loginSection").classList.remove("hidden");
-        document.getElementById("appSection").classList.add("hidden");
+        loginSection.classList.remove("hidden");
+        appSection.classList.add("hidden");
     }
 }
-
 
 // ?? Funci車n para iniciar sesi車n y obtener el token JWT
 async function login() {
@@ -31,7 +41,7 @@ async function login() {
     formData.append("password", password);
 
     try {
-        let response = await fetch("http://127.0.0.1:8000/token", {
+        let response = await fetch(`${BASE_URL}/token`, {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: formData,
@@ -40,21 +50,19 @@ async function login() {
         let result = await response.json();
 
         if (response.ok) {
-            // ?? Guardar token en LocalStorage
             localStorage.setItem("token", result.access_token);
             localStorage.setItem("username", username);
 
-            // ?? Mostrar mensaje de 谷xito y actualizar UI
-            showToast("Inicio de sesion exitoso.", "green");
+            showToast("Inicio de sesi車n exitoso.", "green");
             setTimeout(() => checkLoginStatus(), 500);
         } else {
-            showToast("Usuario o contrase?a incorrectos.", "red");
+            showToast(result.detail || "Usuario o contrase?a incorrectos.", "red");
         }
     } catch (error) {
+        console.error("Error en login:", error);
         showToast("Error al conectar con el servidor.", "red");
     }
 }
-
 
 // ?? Funci車n para cerrar sesi車n
 function logout() {
@@ -63,7 +71,6 @@ function logout() {
     showToast("Has cerrado sesi車n.", "blue");
     setTimeout(() => location.reload(), 1000);
 }
-
 
 // ?? Funci車n para subir PDF con autenticaci車n
 async function uploadPDF() {
@@ -76,18 +83,23 @@ async function uploadPDF() {
     let formData = new FormData();
     formData.append("file", fileInput);
 
-    let response = await fetch("http://127.0.0.1:8000/upload/", {
-        method: "POST",
-        headers: { "Authorization": "Bearer " + localStorage.getItem("token") },
-        body: formData
-    });
+    try {
+        let response = await fetch(`${BASE_URL}/upload/`, {
+            method: "POST",
+            headers: { "Authorization": "Bearer " + localStorage.getItem("token") },
+            body: formData
+        });
 
-    let result = await response.json();
+        let result = await response.json();
 
-    if (response.ok) {
-        showToast("Archivo subido correctamente.", "green");
-    } else {
-        showToast("Error al subir el archivo.", "red");
+        if (response.ok) {
+            showToast("Archivo subido correctamente.", "green");
+        } else {
+            showToast(result.error || "Error al subir el archivo.", "red");
+        }
+    } catch (error) {
+        console.error("Error en uploadPDF:", error);
+        showToast("Error al conectar con el servidor.", "red");
     }
 }
 
@@ -99,15 +111,20 @@ async function splitPDF() {
         return;
     }
 
-    let response = await fetch(`http://127.0.0.1:8000/split/${filename}.pdf`, {
-        method: "GET",
-        headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
-    });
+    try {
+        let response = await fetch(`${BASE_URL}/split/${filename}.pdf`, {
+            method: "GET",
+            headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
+        });
 
-    if (response.ok) {
-        showToast("PDF dividido con 谷xito.", "yellow");
-    } else {
-        showToast("Error al dividir el PDF.", "red");
+        if (response.ok) {
+            showToast("PDF dividido con 谷xito.", "yellow");
+        } else {
+            showToast("Error al dividir el PDF.", "red");
+        }
+    } catch (error) {
+        console.error("Error en splitPDF:", error);
+        showToast("Error al conectar con el servidor.", "red");
     }
 }
 
@@ -119,26 +136,37 @@ async function downloadZip() {
         return;
     }
 
-    let response = await fetch(`http://127.0.0.1:8000/download_zip/${filename}`, {
-        headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
-    });
+    try {
+        let response = await fetch(`${BASE_URL}/download_zip/${filename}`, {
+            headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
+        });
 
-    if (response.ok) {
-        let blob = await response.blob();
-        let link = document.createElement("a");
-        link.href = window.URL.createObjectURL(blob);
-        link.download = `${filename}.zip`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        showToast("Descarga iniciada.", "green");
-    } else {
-        showToast("No se encontr車 el archivo ZIP.", "red");
+        if (response.ok) {
+            let blob = await response.blob();
+            let link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = `${filename}.zip`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Descarga iniciada.", "green");
+        } else {
+            showToast("No se encontr車 el archivo ZIP.", "red");
+        }
+    } catch (error) {
+        console.error("Error en downloadZip:", error);
+        showToast("Error al conectar con el servidor.", "red");
     }
 }
 
 // ?? Funci車n para mostrar mensajes flotantes (Toasts)
 function showToast(message, color) {
+    let toastContainer = document.getElementById("toast-container");
+    if (!toastContainer) {
+        console.error("No se encontr車 el contenedor de notificaciones.");
+        return;
+    }
+
     let toast = document.createElement("div");
     toast.className = `bg-${color}-500 text-white px-4 py-2 rounded shadow-lg fixed top-5 right-5 opacity-100 transition-opacity duration-300 transform translate-x-0`;
     toast.style.minWidth = "250px";
@@ -149,7 +177,6 @@ function showToast(message, color) {
     toast.style.fontWeight = "bold";
     toast.innerHTML = message;
 
-    let toastContainer = document.getElementById("toast-container");
     toastContainer.appendChild(toast);
 
     // ?? Desaparecer芍 despu谷s de 3 segundos con animaci車n
