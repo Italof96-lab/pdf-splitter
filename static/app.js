@@ -163,15 +163,34 @@ async function splitPDF() {
 // ?? Funci¨®n para descargar el ZIP del PDF con autenticaci¨®n
 async function downloadZip() {
     let filename = document.getElementById("filename").value.trim();
+    let progressContainer = document.getElementById("progressContainer");
+    let progressBar = document.getElementById("progressBar");
+
     if (!filename) {
         showToast("Ingresa el nombre del archivo para descargar el ZIP.", "red");
         return;
     }
 
     try {
+        // ?? Mostrar la barra de progreso
+        progressContainer.classList.remove("hidden");
+        progressBar.style.width = "0%"; // Reiniciar barra
+
+        // Simular el progreso en intervalos
+        let progress = 0;
+        let interval = setInterval(() => {
+            if (progress < 90) {
+                progress += 10;
+                progressBar.style.width = `${progress}%`;
+            }
+        }, 500);
+
+        // ?? Hacer la solicitud al backend
         let response = await fetch(`${BASE_URL}/download_zip/${filename}`, {
             headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
         });
+
+        clearInterval(interval); // Detener el intervalo
 
         if (response.ok) {
             let blob = await response.blob();
@@ -181,15 +200,24 @@ async function downloadZip() {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+
+            progressBar.style.width = "100%"; // ?? Completar barra
+            setTimeout(() => {
+                progressContainer.classList.add("hidden"); // Ocultar barra tras exito
+            }, 500);
+
             showToast("Descarga iniciada.", "green");
         } else {
+            progressContainer.classList.add("hidden");
             showToast("No se encontro el archivo ZIP.", "red");
         }
     } catch (error) {
         console.error("Error en downloadZip:", error);
+        progressContainer.classList.add("hidden");
         showToast("Error al conectar con el servidor.", "red");
     }
 }
+
 
 // ?? Funci¨®n para mostrar mensajes flotantes (Toasts)
 function showToast(message, color) {
