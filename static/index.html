@@ -9,8 +9,10 @@
 </head>
 <body class="bg-gray-100 flex flex-col justify-center items-center min-h-screen">
 	
-	<!-- Barra de carga en la esquina superior derecha -->
-	<div id="loadingBar" class="absolute top-2 right-4 bg-green-500 h-6 w-36 rounded-md hidden"></div>
+	<!-- Contenedor de la barra de carga -->
+	<div id="progressContainer" class="absolute top-2 right-4 w-36 h-6 bg-white border border-gray-400 rounded-md hidden overflow-hidden">
+    <div id="progressBar" class="h-full bg-green-500 w-0 transition-all duration-300"></div>
+	</div>
 
 	<div class="absolute top-2 left-4 text-gray-700 font-bold text-lg" id="welcomeMessage"></div> <!-- Mensaje de bienvenida -->
     <!-- Contenedor Principal -->

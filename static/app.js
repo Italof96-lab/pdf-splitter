@@ -37,7 +37,7 @@ async function login() {
     const password = document.getElementById("password").value.trim();
 
     if (!username || !password) {
-        showToast("Por favor, ingresa usuario y contrase?a.", "red");
+        showToast("Por favor, ingresa usuario y contrasena.", "red");
         return;
     }
 
@@ -58,10 +58,10 @@ async function login() {
             localStorage.setItem("token", result.access_token);
             localStorage.setItem("username", username);
 
-            showToast("Inicio de sesi車n exitoso.", "green");
+            showToast("Inicio de sesion exitoso.", "green");
             setTimeout(() => checkLoginStatus(), 500);
         } else {
-            showToast(result.detail || "Usuario o contrase?a incorrectos.", "red");
+            showToast(result.detail || "Usuario o contrasena incorrectos.", "red");
         }
     } catch (error) {
         console.error("Error en login:", error);
@@ -73,7 +73,7 @@ async function login() {
 function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("username");
-    showToast("Has cerrado sesi車n.", "blue");
+    showToast("Has cerrado sesion.", "blue");
     setTimeout(() => location.reload(), 1000);
 }
 
@@ -111,7 +111,8 @@ async function uploadPDF() {
 // ?? Funci車n para dividir el PDF con autenticaci車n
 async function splitPDF() {
     let filename = document.getElementById("filename").value.trim();
-    let loadingBar = document.getElementById("loadingBar");
+    let progressContainer = document.getElementById("progressContainer");
+    let progressBar = document.getElementById("progressBar");
 
     if (!filename) {
         showToast("Ingresa el nombre del archivo (sin .pdf).", "red");
@@ -119,30 +120,45 @@ async function splitPDF() {
     }
 
     try {
-        // ?? Mostrar la barra de carga al iniciar el proceso
-        loadingBar.classList.remove("hidden");
+        // ?? Mostrar la barra de progreso
+        progressContainer.classList.remove("hidden");
+        progressBar.style.width = "0%"; // Reiniciar barra
 
+        // Simular el progreso en intervalos
+        let progress = 0;
+        let interval = setInterval(() => {
+            if (progress < 90) {
+                progress += 10;
+                progressBar.style.width = `${progress}%`;
+            }
+        }, 500);
+
+        // ?? Hacer la solicitud al backend
         let response = await fetch(`${BASE_URL}/split/${filename}.pdf`, {
             method: "GET",
             headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
         });
 
+        clearInterval(interval); // Detener el intervalo
+
         if (response.ok) {
+            progressBar.style.width = "100%"; // ?? Completar barra
             setTimeout(() => {
-                loadingBar.classList.add("hidden"); // ?? Ocultar la barra de carga despues de completar
-            }, 1000);
+                progressContainer.classList.add("hidden"); // Ocultar barra tras exito
+            }, 500);
 
             showToast("PDF dividido con exito.", "yellow");
         } else {
-            loadingBar.classList.add("hidden");
+            progressContainer.classList.add("hidden");
             showToast("Error al dividir el PDF.", "red");
         }
     } catch (error) {
         console.error("Error en splitPDF:", error);
-        loadingBar.classList.add("hidden");
+        progressContainer.classList.add("hidden");
         showToast("Error al conectar con el servidor.", "red");
     }
 }
+
 
 // ?? Funci車n para descargar el ZIP del PDF con autenticaci車n
 async function downloadZip() {
@@ -167,7 +183,7 @@ async function downloadZip() {
             document.body.removeChild(link);
             showToast("Descarga iniciada.", "green");
         } else {
-            showToast("No se encontr車 el archivo ZIP.", "red");
+            showToast("No se encontro el archivo ZIP.", "red");
         }
     } catch (error) {
         console.error("Error en downloadZip:", error);
@@ -179,7 +195,7 @@ async function downloadZip() {
 function showToast(message, color) {
     let toastContainer = document.getElementById("toast-container");
     if (!toastContainer) {
-        console.error("No se encontr車 el contenedor de notificaciones.");
+        console.error("No se encontro el contenedor de notificaciones.");
         return;
     }
 
